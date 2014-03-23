@@ -1,4 +1,4 @@
-angular.module('socialfight', ['angular-gestures', 'ngCookies', 'ngResource', 'ngSanitize', 'ui.router', 'ngStorage']).config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$httpProvider'].concat(function($locationProvider, $stateProvider, $urlRouterProvider, $httpProvider){
+angular.module('socialfight', ['btford.socket-io', 'angular-gestures', 'ngCookies', 'ngResource', 'ngSanitize', 'ui.router', 'ngStorage']).config(['$locationProvider', '$stateProvider', '$urlRouterProvider', '$httpProvider'].concat(function($locationProvider, $stateProvider, $urlRouterProvider, $httpProvider){
   $locationProvider.html5Mode(true);
   $locationProvider.hashPrefix('!');
   $urlRouterProvider.otherwise('/');

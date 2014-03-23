@@ -1,0 +1,38 @@
+'use strict';
+
+var path = require('path');
+
+module.exports = function (done) {
+
+  this.express(function (app, express) {
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'jade');
+    app.use(express.favicon());
+    app.use(express.logger('dev'));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(app.router);
+  });
+
+  this.routes();
+
+  done();
+};
+
+
+var app = require('express')()
+  , server = require('http').createServer(app)
+  , io = require('socket.io').listen(server);
+
+server.listen(8880);
+
+// app.get('/', function (req, res) {
+//   res.sendfile(__dirname + '/index.html');
+// });
+
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});

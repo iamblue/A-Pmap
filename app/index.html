@@ -14,7 +14,7 @@
   </head>
   <body>
     <header>
-      <h2 class="header__h2">立法院遊行戰略地圖</h2>
+      <h2 class="header__h2">遊行戰略地圖</h2>
       <a class="header__follow" href="" ng-click="followthis()">
         follow
       </a>
@@ -55,7 +55,7 @@
         app__frame.style.height = window.innerHeight+'px'
       else
         app__frame.style.height = '480px'
-      // alert(window.height)
+      // // alert(window.height)
     </script>
     <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
     <script src="bower_components/angular/angular.js"></script>
@@ -67,6 +67,7 @@
         <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
         <script src="bower_components/angular-gestures/gestures.min.js"></script>
+        <script src="bower_components/angular-socket-io/socket.min.js"></script>
 <!-- - See more at: http://hlchang.com/?p=361#sthash.zouuxsIU.dpuf -->
         <!-- endbuild -->
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -74,5 +75,6 @@
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/directives/directives.js"></script>
         <!-- endbuild -->
+        <script src="http://localhost:8880/socket.io/socket.io.js"></script>
 </body>
 </html>

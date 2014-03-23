@@ -1,5 +1,16 @@
-angular.module('socialfight').controller('mainCtrl', ['$timeout', '$window', '$http', '$scope', '$rootScope', '$location', '$localStorage'].concat(function($timeout, $window, $http, $scope, $rootScope, $location, $localStorage){
+angular.module('socialfight').factory('mySocket', function(){
+  return io.connect('http://localhost:8880');
+}).controller('mainCtrl', ['mySocket', '$timeout', '$window', '$http', '$scope', '$rootScope', '$location', '$localStorage'].concat(function(mySocket, $timeout, $window, $http, $scope, $rootScope, $location, $localStorage){
   var styles, styledMap, iconBase, icons, cities, mapOptions, infoWindow, createMarker, i$, to$, i, results$ = [];
+  mySocket.on('news', function(data){
+    console.log(data);
+    return mySocket.emit('my other event', {
+      my: 'data'
+    });
+  });
+  $scope.kerker = function(){
+    return alert('12333');
+  };
   styles = [
     {
       featureType: "water",
@@ -38,6 +49,24 @@ angular.module('socialfight').controller('mainCtrl', ['$timeout', '$window', '$h
         }
       ]
     }, {
+      featureType: "road",
+      elementType: "labels.icon",
+      stylers: [{
+        visibility: 'off'
+      }]
+    }, {
+      featureType: "road",
+      elementType: "labels.icon",
+      stylers: [{
+        visibility: 'off'
+      }]
+    }, {
+      featureType: "poi",
+      elementType: "labels.icon",
+      stylers: [{
+        visibility: 'off'
+      }]
+    }, {
       featureType: "road.arterial",
       elementType: "geometry.fill",
       stylers: [{
@@ -56,21 +85,32 @@ angular.module('socialfight').controller('mainCtrl', ['$timeout', '$window', '$h
     }, {
       featureType: "road.local",
       elementType: "geometry",
-      stylers: [{
-        color: '#000000'
-      }]
-    }, {
-      elementType: "labels.text.fill",
-      stylers: [{
-        color: '#ffffff'
-      }]
-    }, {
-      elementType: "labels.text.stroke",
       stylers: [
         {
           color: '#000000'
         }, {
+          visibility: "off"
+        }
+      ]
+    }, {
+      featureType: "road.arterial",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: '#999999'
+        }, {
           lightness: 13
+        }
+      ]
+    }, {
+      elementType: "labels.text.stroke",
+      stylers: [
+        {
+          color: '#eeeeee'
+        }, {
+          lightness: 13
+        }, {
+          visibility: "off"
         }
       ]
     }, {
@@ -115,29 +155,24 @@ angular.module('socialfight').controller('mainCtrl', ['$timeout', '$window', '$h
   };
   cities = [
     {
-      city: 'New York',
+      city: '青島轉播',
       desc: 'This city is aiiiiite!',
-      lat: 25.0435,
+      lat: 25.0441,
       long: 121.5210,
       icon: icons.parking.icon
     }, {
-      city: 'Chicago',
-      desc: 'This is the second best city in the world!',
-      lat: 25.0435,
-      long: 121.5210,
+      city: '濟南轉播',
+      desc: 'This is the second best city in the world!<a ng-click="kerker(123)">123</a>',
+      lat: 25.0430,
+      long: 121.5203,
       icon: icons.parking.icon
     }, {
-      city: 'Los Angeles',
+      city: '議場轉播',
       desc: 'This city is live!',
-      lat: 25.0435,
+      lat: 25.04360,
       long: 121.5210,
-      icon: icons.parking.icon
-    }, {
-      city: 'Las Vegas',
-      desc: 'Sin City...nuff said!',
-      lat: 25.0435,
-      long: 121.5210,
-      icon: icons.parking.icon
+      icon: icons.parking.icon,
+      editable: true
     }
   ];
   mapOptions = {
@@ -162,14 +197,11 @@ angular.module('socialfight').controller('mainCtrl', ['$timeout', '$window', '$h
       title: info.city,
       icon: info.icon
     });
-    console.log(icons.parking);
     marker.content = '<div class="infoWindowContent">' + info.desc + '</div>';
-    google.maps.event.addListener(marker, 'click', function(){
+    $scope.aaa = 0;
+    google.maps.event.addListener(marker, 'click', function(e, b){
       infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
-      infoWindow.open($scope.map, marker);
-    });
-    google.maps.event.addListener(marker, 'dragstart', function(){
-      alert('123');
+      return infoWindow.open($scope.map, marker);
     });
     $scope.markers.push(marker);
   };

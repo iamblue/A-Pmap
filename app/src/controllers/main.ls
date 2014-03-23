@@ -1,5 +1,25 @@
+
+# socket = io.connect('http://localhost:8880');
+# socket.on 'news', (data) ->
+#   console.log(data);
+#   socket.emit('my other event', { my: 'data' });
+
 angular.module \socialfight 
-  .controller \mainCtrl, <[$timeout $window $http $scope $rootScope $location $localStorage]> ++ ($timeout, $window, $http, $scope, $rootScope, $location, $localStorage) ->
+  # .config(function (socketProvider) {
+  #   socketProvider.prefix('foo~');
+  #   socketProvider.ioSocket(io.connect('/some/path'))
+  .factory 'mySocket', ->
+    io.connect('http://localhost:8880')
+    
+  .controller \mainCtrl, <[mySocket $timeout $window $http $scope $rootScope $location $localStorage]> ++ (mySocket, $timeout, $window, $http, $scope, $rootScope, $location, $localStorage) ->
+    # http://jsfiddle.net/svigna/pc7Uu/
+    mySocket.on 'news', (data)->
+      # $scope.bar = true;
+      console.log(data);
+      mySocket.emit('my other event', { my: 'data' });
+    $scope.kerker = ->
+      alert \12333
+    
     styles = [
       {
         featureType:"water",
@@ -35,6 +55,22 @@ angular.module \socialfight
             {lightness:25}
           ]
       },
+      
+      {
+        featureType:"road",
+        elementType:"labels.icon",
+        stylers:[visibility:'off']
+      },
+      {
+        featureType:"road",
+        elementType:"labels.icon",
+        stylers:[visibility:'off']
+      },
+      {
+        featureType: "poi",
+        elementType:"labels.icon",
+        stylers:[visibility:'off']
+      },
       {
         featureType:"road.arterial",
         elementType:"geometry.fill",
@@ -49,15 +85,16 @@ angular.module \socialfight
       {
         featureType:"road.local",
         elementType:"geometry",
-        stylers:[{color:\#000000}]
+        stylers:[{color:\#000000},visibility: "off"]
       },
-      {
+      { 
+        featureType:"road.arterial",
         elementType:"labels.text.fill",
-        stylers:[{color:\#ffffff}]
+        stylers:[{color:\#999999},{lightness:13}]
       },
       {
         elementType:"labels.text.stroke",
-        stylers:[{color:'#000000'},{lightness:13}]
+        stylers:[{color:'#eeeeee'},{lightness:13},visibility: "off"]
       },
       {
         featureType:"transit",
@@ -92,33 +129,35 @@ angular.module \socialfight
       #     long : -79.4000
       # },
       {
-          city : 'New York',
-          desc : 'This city is aiiiiite!',
-          lat : 25.0435,
-          long : 121.5210,
+          city : '青島轉播'
+          desc : 'This city is aiiiiite!'
+          lat : 25.0441
+          long : 121.5210
+          icon: icons.parking.icon
+          # editable: true
+      },
+      {
+          city : '濟南轉播'
+          desc : 'This is the second best city in the world!<a ng-click="kerker(123)">123</a>',
+          lat : 25.0430
+          long : 121.5203
           icon: icons.parking.icon
       },
       {
-          city : 'Chicago',
-          desc : 'This is the second best city in the world!',
-          lat : 25.0435,
+          city : '議場轉播'
+          desc : 'This city is live!'
+          lat : 25.04360
           long : 121.5210
           icon: icons.parking.icon
+          editable: true
       },
-      {
-          city : 'Los Angeles',
-          desc : 'This city is live!',
-          lat : 25.0435,
-          long : 121.5210
-          icon: icons.parking.icon
-      },
-      {
-          city : 'Las Vegas',
-          desc : 'Sin City...nuff said!',
-          lat : 25.0435,
-          long : 121.5210
-          icon: icons.parking.icon
-      }
+      # {
+      #     city : 'Las Vegas',
+      #     desc : 'Sin City...nuff said!',
+      #     lat : 25.0435,
+      #     long : 121.5210
+      #     icon: icons.parking.icon
+      # }
     ]
     mapOptions = 
       zoom: 18
@@ -137,6 +176,19 @@ angular.module \socialfight
     
     createMarker = (info) !->
       console.log info.lat
+      # circleOptions = 
+      #   center: new google.maps.LatLng(25.0435, 121.5210)
+      #   radius: 250
+      #   map: $scope.map
+      #   # fillColor: '#dedede'
+      #   # fillOpacity: 0
+      #   # editable: true
+      #   # strokeColor: "#FF0000"
+      #   # strokeOpacity: 0.8
+      #   # strokeWeight: 2
+      #   # fillColor: "#dedede"
+      #   # fillOpacity: 0.8
+      # circle = new google.maps.Circle(circleOptions);
       
       marker = new google.maps.Marker(
         {
@@ -146,20 +198,36 @@ angular.module \socialfight
           icon:info.icon
         }
       )
-
-      console.log icons.parking
+      # console.log icons.parking
       marker.content = '<div class="infoWindowContent">' + info.desc + '</div>';
-      
-      google.maps.event.addListener marker, 'click', !->
+      $scope.aaa= 0
+      google.maps.event.addListener marker, 'click', (e,b)->
+        # console.log(e)
+        # console.log b
         infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
         infoWindow.open $scope.map, marker
-      google.maps.event.addListener marker, 'dragstart', !->
-        alert('123')
+        # $scope.kerker()
+        
+
+
+      # google.maps.event.addListener marker, 'load', !->
+      #   # alert('123')
+      #   infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
+      #   infoWindow.open $scope.map, marker
       
+      # google.maps.event.addListener window, 'load', !->
+      #   # alert('123')
+      #   infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
+      #   infoWindow.open $scope.map, marker
 
       $scope.markers.push marker
   
     for i from 0 to cities.length - 1 by 1
       createMarker cities[i]
+    
+    # $scope.openInfoWindow = (e, selectedMarker)!->
+    #   console.log 8888
+    #   e.preventDefault();
+    #   google.maps.event.trigger(selectedMarker, 'click');
     
     
