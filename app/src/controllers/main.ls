@@ -3,23 +3,75 @@
 # socket.on 'news', (data) ->
 #   console.log(data);
 #   socket.emit('my other event', { my: 'data' });
+yt = 0
+
+
+
+  # yt = 1
 
 angular.module \socialfight 
-  # .config(function (socketProvider) {
-  #   socketProvider.prefix('foo~');
-  #   socketProvider.ioSocket(io.connect('/some/path'))
+  # .factory 'clickyutube', ($timeout)->
+  #   $timeout ->
+  #     yt := yt
+  #     console.log yt
+  #   ,100
+  #   yt  
+  .run <[]> ++  ->
+    clickyt = (obj) ->
+      console.log yt
+      yt := 1 
   .factory 'mySocket', ->
-    io.connect('http://localhost:8880')
-    
+    io.connect('http://localhost:8880')  
+  # .run 
+    # if(window.navigator.geolocation)   
+    #   geolocation=window.navigator.geolocation;   
+    #   geolocation.getCurrentPosition(getPositionSuccess);   
+    # else   
+    #   alert("你的瀏覽器不支援地理定位");   
+         
   .controller \mainCtrl, <[mySocket $timeout $window $http $scope $rootScope $location $localStorage]> ++ (mySocket, $timeout, $window, $http, $scope, $rootScope, $location, $localStorage) ->
     # http://jsfiddle.net/svigna/pc7Uu/
+    # $http.get 'http://localhost:3000/irc/news'
+    # .success (d) ->
+    #   console.log d
+    #   $scope.frommsg = 0
+    #   $scope.msg = d.data[0].content[0]
+    # $scope.$watch \clickyutube , ->
+    #   console.log clickyutube
+    #   if clickyutube != 0
+    #     alert 4444
+    $scope.$on \onmsg , ->
+      $scope.inputmsg = !$scope.inputmsg
+    $scope.leavemsg = ->
+      $scope.$emit \onmsg
+
+    $scope.selectmsgtag = [
+      {id:0, name:'求救'},
+      {id:1, name:'警方情報'}
+    ]
+    $scope.selValue = 0
+
+    $timeout ->
+      console.log yt
+    ,100
+    $scope.msg = '讀取消息中...'  
     mySocket.on 'news', (data)->
-      # $scope.bar = true;
-      console.log(data);
+      console.log(data.g0v);
+      if data.g0v
+        $scope.msg = data.g0v
+        $scope.frommsg = 1
+      if data.main
+        $scope.msg = data.main
+        $scope.frommsg = 0
+      $scope.$apply!
       mySocket.emit('my other event', { my: 'data' });
-    $scope.kerker = ->
-      alert \12333
     
+    mySocket.on 'sos', (data)->
+      # $timeout ->
+      #   angular.foreach cities, (v,i,o)->
+      #     v.
+
+      ,3000
     styles = [
       {
         featureType:"water",
@@ -138,7 +190,7 @@ angular.module \socialfight
       },
       {
           city : '濟南轉播'
-          desc : 'This is the second best city in the world!<a ng-click="kerker(123)">123</a>',
+          desc : 'This is the second best city in the world!<a href="" onclick="clickyt(2)">123</a>',
           lat : 25.0430
           long : 121.5203
           icon: icons.parking.icon
@@ -159,12 +211,15 @@ angular.module \socialfight
       #     icon: icons.parking.icon
       # }
     ]
+
     mapOptions = 
       zoom: 18
+      zoomControl: false,
+      scaleControl: false,
       center: new google.maps.LatLng(25.0435, 121.5210)
       mapTypeId: google.maps.MapTypeId.TERRAIN
       mapTypeControlOptions: 
-        mapTypeIds: [google.maps.MapTypeId.ROADMAP, \map_style]
+        mapTypeIds: [google.maps.MapTypeId.HYBRID, \map_style]
     
 
     $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -201,14 +256,17 @@ angular.module \socialfight
       # console.log icons.parking
       marker.content = '<div class="infoWindowContent">' + info.desc + '</div>';
       $scope.aaa= 0
+      
       google.maps.event.addListener marker, 'click', (e,b)->
-        # console.log(e)
-        # console.log b
+        console.log e
         infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
         infoWindow.open $scope.map, marker
-        # $scope.kerker()
-        
-
+      
+      google.maps.event.addDomListener $scope.map, 'click', (e,r,y)-> 
+        $scope.tagposition = e.latLng
+        console.log $scope.tagposition
+        $scope.$emit \onmsg
+        $scope.$apply!
 
       # google.maps.event.addListener marker, 'load', !->
       #   # alert('123')
@@ -221,13 +279,23 @@ angular.module \socialfight
       #   infoWindow.open $scope.map, marker
 
       $scope.markers.push marker
+    init = ->
+      for i from 0 to cities.length - 1 by 1
+        createMarker cities[i]
+    init!
+
+
+    $scope.sendmsg = ->
+      # if ($scope.)
+      _tmp = {
+        lat : $scope.tagposition.k
+        long : $scope.tagposition.A
+        icon: icons.parking.icon
+      }
+      cities.push(_tmp)
+      init!
+      mySocket.emit('sos', { p: $scope.tagposition , icon:1 })
+      $scope.$emit \onmsg
+      
+
   
-    for i from 0 to cities.length - 1 by 1
-      createMarker cities[i]
-    
-    # $scope.openInfoWindow = (e, selectedMarker)!->
-    #   console.log 8888
-    #   e.preventDefault();
-    #   google.maps.event.trigger(selectedMarker, 'click');
-    
-    

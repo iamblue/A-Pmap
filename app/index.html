@@ -13,9 +13,15 @@
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   </head>
   <body>
+    <div class="msginput__frame" ng-show="inputmsg"> 
+      <select ng-model="selValue" class="addname" ng-options="m.id as m.name for m in selectmsgtag">
+      </select>
+      <input type="text" /> 
+      <button ng-click="sendmsg()">送出</button>
+    </div>
     <header>
       <h2 class="header__h2">遊行戰略地圖</h2>
-      <a class="header__follow" href="" ng-click="followthis()">
+      <a class="header__follow" href="" ng-click="leavemsg()">
         follow
       </a>
     </header>
@@ -30,7 +36,14 @@
       </div>
       <div class="app__need">
         <ul>
-          <li>
+          <li class="yt1">
+            123
+          </li>
+          <li class="yt2">
+            456
+          </li>
+          <li class="yt3">
+            789
           </li>
         </ul>
       </div>
@@ -39,6 +52,14 @@
       <div class="app__tag">
       </div>
     </div>
+    <footer>
+      <div class="footer__font" ng-show="frommsg == 1">
+        <span class="g0vmsg">[g0v頻道]</span>  {{msg}}
+      </div>
+      <div class="footer__font" ng-show="frommsg == 0">
+        <span class="g0vmsg">[活動頻道]</span>  {{msg}}
+      </div>
+    </footer>
     <!-- Add your site or application content here -->
     <script>
        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -58,6 +79,8 @@
       // // alert(window.height)
     </script>
     <script src='//maps.googleapis.com/maps/api/js?sensor=false'></script>
+    <script src='//google-maps-utility-library-v3.googlecode.com/svn-history/r131/trunk/markerwithlabel/src/markerwithlabel.js'></script>
+    
     <script src="bower_components/angular/angular.js"></script>
         <!-- build:js scripts/modules.js -->
         <script src="bower_components/hammerjs/hammer.min.js"></script>
@@ -67,7 +90,6 @@
         <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
         <script src="bower_components/angular-gestures/gestures.min.js"></script>
-        <script src="bower_components/angular-socket-io/socket.min.js"></script>
 <!-- - See more at: http://hlchang.com/?p=361#sthash.zouuxsIU.dpuf -->
         <!-- endbuild -->
         <!-- build:js({.tmp,app}) scripts/scripts.js -->

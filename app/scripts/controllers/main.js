@@ -1,16 +1,51 @@
-angular.module('socialfight').factory('mySocket', function(){
+var yt;
+yt = 0;
+angular.module('socialfight').run([].concat(function(){
+  var clickyt;
+  return clickyt = function(obj){
+    console.log(yt);
+    return yt = 1;
+  };
+})).factory('mySocket', function(){
   return io.connect('http://localhost:8880');
 }).controller('mainCtrl', ['mySocket', '$timeout', '$window', '$http', '$scope', '$rootScope', '$location', '$localStorage'].concat(function(mySocket, $timeout, $window, $http, $scope, $rootScope, $location, $localStorage){
-  var styles, styledMap, iconBase, icons, cities, mapOptions, infoWindow, createMarker, i$, to$, i, results$ = [];
+  var styles, styledMap, iconBase, icons, cities, mapOptions, infoWindow, createMarker, init;
+  $scope.$on('onmsg', function(){
+    return $scope.inputmsg = !$scope.inputmsg;
+  });
+  $scope.leavemsg = function(){
+    return $scope.$emit('onmsg');
+  };
+  $scope.selectmsgtag = [
+    {
+      id: 0,
+      name: '求救'
+    }, {
+      id: 1,
+      name: '警方情報'
+    }
+  ];
+  $scope.selValue = 0;
+  $timeout(function(){
+    return console.log(yt);
+  }, 100);
+  $scope.msg = '讀取消息中...';
   mySocket.on('news', function(data){
-    console.log(data);
+    console.log(data.g0v);
+    if (data.g0v) {
+      $scope.msg = data.g0v;
+      $scope.frommsg = 1;
+    }
+    if (data.main) {
+      $scope.msg = data.main;
+      $scope.frommsg = 0;
+    }
+    $scope.$apply();
     return mySocket.emit('my other event', {
       my: 'data'
     });
   });
-  $scope.kerker = function(){
-    return alert('12333');
-  };
+  mySocket.on('sos', function(data){}, 3000);
   styles = [
     {
       featureType: "water",
@@ -162,7 +197,7 @@ angular.module('socialfight').factory('mySocket', function(){
       icon: icons.parking.icon
     }, {
       city: '濟南轉播',
-      desc: 'This is the second best city in the world!<a ng-click="kerker(123)">123</a>',
+      desc: 'This is the second best city in the world!<a href="" onclick="clickyt(2)">123</a>',
       lat: 25.0430,
       long: 121.5203,
       icon: icons.parking.icon
@@ -177,10 +212,12 @@ angular.module('socialfight').factory('mySocket', function(){
   ];
   mapOptions = {
     zoom: 18,
+    zoomControl: false,
+    scaleControl: false,
     center: new google.maps.LatLng(25.0435, 121.5210),
     mapTypeId: google.maps.MapTypeId.TERRAIN,
     mapTypeControlOptions: {
-      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+      mapTypeIds: [google.maps.MapTypeId.HYBRID, 'map_style']
     }
   };
   $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -200,14 +237,40 @@ angular.module('socialfight').factory('mySocket', function(){
     marker.content = '<div class="infoWindowContent">' + info.desc + '</div>';
     $scope.aaa = 0;
     google.maps.event.addListener(marker, 'click', function(e, b){
+      console.log(e);
       infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
       return infoWindow.open($scope.map, marker);
     });
+    google.maps.event.addDomListener($scope.map, 'click', function(e, r, y){
+      $scope.tagposition = e.latLng;
+      console.log($scope.tagposition);
+      $scope.$emit('onmsg');
+      return $scope.$apply();
+    });
     $scope.markers.push(marker);
   };
-  for (i$ = 0, to$ = cities.length - 1; i$ <= to$; ++i$) {
-    i = i$;
-    results$.push(createMarker(cities[i]));
-  }
-  return results$;
+  init = function(){
+    var i$, to$, i, results$ = [];
+    for (i$ = 0, to$ = cities.length - 1; i$ <= to$; ++i$) {
+      i = i$;
+      results$.push(createMarker(cities[i]));
+    }
+    return results$;
+  };
+  init();
+  return $scope.sendmsg = function(){
+    var _tmp;
+    _tmp = {
+      lat: $scope.tagposition.k,
+      long: $scope.tagposition.A,
+      icon: icons.parking.icon
+    };
+    cities.push(_tmp);
+    init();
+    mySocket.emit('sos', {
+      p: $scope.tagposition,
+      icon: 1
+    });
+    return $scope.$emit('onmsg');
+  };
 }));
